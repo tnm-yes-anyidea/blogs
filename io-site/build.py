@@ -4,7 +4,7 @@ import subprocess
 import json
 
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-EXCLUDE_DIRS = {".git", ".github", "io-site", "data", "figures", "calculations"}
+EXCLUDE_DIRS = {".git", ".github", "io-site", "data", "figures", "calculations", "quotes"}
 
 # Header with MathJax 3 configuration for complete TeX math/macro rendering
 PANDOC_HEADER = """<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -31,6 +31,10 @@ a { color: #0066cc; text-decoration: none; }
 a:hover { text-decoration: underline; }
 .title { font-size: 2em; margin-bottom: 0.2em; }
 .author { font-weight: bold; color: #555; margin-bottom: 2em; }
+.quote-card { background: #f8f9fa; border: 1px solid #ddd; border-radius: 6px; padding: 1.2rem; margin-bottom: 1.5rem; }
+.quote-meta { display: flex; justify-content: space-between; font-size: 0.8rem; color: #666; margin-bottom: 0.8rem; }
+.quote-body { margin: 0 0 0.8rem 0; font-size: 1.1rem; color: #222; font-style: italic; }
+.quote-author { font-size: 0.85rem; color: #555; text-align: right; font-style: italic; }
 </style>
 """
 
@@ -81,6 +85,41 @@ def compile_file(input_file, output_html, title):
         return False
     return True
 
+def load_quotes():
+    quotes_path = os.path.join(ROOT_DIR, "quotes", "quotes.md")
+    if not os.path.exists(quotes_path):
+        return ""
+
+    with open(quotes_path, "r", encoding="utf-8") as f:
+        content = f.read()
+
+    entries = [e.strip() for e in content.split("---") if e.strip()]
+    cards = []
+
+    for entry in entries:
+        date_m = re.search(r"^#\s+(.+)$", entry, re.MULTILINE)
+        topic_m = re.search(r"^##\s+(.+)$", entry, re.MULTILINE)
+        quote_m = re.search(r"^>\s*\"?(.+?)\"?$", entry, re.MULTILINE)
+        author_m = re.search(r"^—\s*(.+)$", entry, re.MULTILINE)
+
+        date = date_m.group(1) if date_m else ""
+        topic = topic_m.group(1) if topic_m else ""
+        quote = quote_m.group(1) if quote_m else entry
+        author = author_m.group(1) if author_m else "anonymous"
+
+        cards.append(f"""
+        <article class="quote-card">
+            <div class="quote-meta">
+                <span>{date}</span>
+                <span>{topic}</span>
+            </div>
+            <blockquote class="quote-body">“{quote}”</blockquote>
+            <div class="quote-author">— {author}</div>
+        </article>
+        """)
+
+    return "".join(cards)
+
 def main():
     blogs = []
     print(f"Scanning directory: {ROOT_DIR}")
@@ -104,6 +143,8 @@ def main():
                     blogs.append({"title": title, "path": f"{entry}/index.html"})
 
     list_items = "".join([f'<li><a href="{b["path"]}">{b["title"]}</a></li>' for b in blogs])
+    quotes_html = load_quotes()
+
     main_index = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -116,6 +157,14 @@ def main():
     <main>
         <h1>Articles & Research Papers</h1>
         <ul>{list_items if list_items else '<li>No blog posts found.</li>'}</ul>
+
+        <hr style="margin: 2.5rem 0; border: 0; border-top: 1px solid #ddd;">
+
+        <h2>Reflections & Quotes</h2>
+        <div id="quotes-section">
+            {quotes_html if quotes_html else '<p style="color: #666;">No quotes found in quotes/quotes.md.</p>'}
+        </div>
+        <a href="quotes/quotes.html" class="quotes-link">View full quotes page →</a>
     </main>
 </body>
 </html>"""
