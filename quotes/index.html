@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quotes</title>
+    <style>
+        :root {
+            --bg: #0f0f11;
+            --text: #e1e1e6;
+            --muted: #888893;
+            --accent: #ffffff;
+            --card-bg: #16161a;
+            --border: #26262e;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 2rem 1rem;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 640px;
+            width: 100%;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 3rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 1rem;
+        }
+
+        .back-link {
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover { color: var(--accent); }
+
+        .title {
+            font-size: 1.1rem;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin: 0;
+        }
+
+        .quote-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.8rem;
+            margin-bottom: 2rem;
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+
+        .quote-card:hover {
+            border-color: #3f3f4e;
+        }
+
+        .meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: var(--muted);
+            margin-bottom: 1.2rem;
+            text-transform: lowercase;
+        }
+
+        blockquote {
+            margin: 0 0 1.2rem 0;
+            font-size: 1.25rem;
+            line-height: 1.6;
+            font-family: "Georgia", Georgia, serif;
+            color: var(--accent);
+        }
+
+        .author {
+            font-size: 0.85rem;
+            color: var(--muted);
+            text-align: right;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <a href="../" class="back-link">← back</a>
+            <h1 class="title">Reflections</h1>
+        </div>
+        <div id="quotes-container">Loading...</div>
+    </div>
+
+    <script>
+        async function loadQuotes() {
+            const container = document.getElementById('quotes-container');
+            try {
+                const res = await fetch('quotes.md');
+                if (!res.ok) throw new Error('Could not load quotes.md');
+                const text = await res.text();
+
+                const entries = text.split('---').map(e => e.trim()).filter(Boolean);
+                container.innerHTML = '';
+
+                entries.forEach(entry => {
+                    const dateMatch = entry.match(/^#\s+(.+)$/m);
+                    const topicMatch = entry.match(/^##\s+(.+)$/m);
+                    const quoteMatch = entry.match(/^>\s*"?(.+?)"?$/m);
+                    const authorMatch = entry.match(/^—\s*(.+)$/m);
+
+                    const card = document.createElement('article');
+                    card.className = 'quote-card';
+                    card.innerHTML = `
+                        <div class="meta">
+                            <span>${dateMatch ? dateMatch[1] : ''}</span>
+                            <span>${topicMatch ? topicMatch[1] : ''}</span>
+                        </div>
+                        <blockquote>“${quoteMatch ? quoteMatch[1] : entry}”</blockquote>
+                        <div class="author">— ${authorMatch ? authorMatch[1] : 'anonymous'}</div>
+                    `;
+                    container.appendChild(card);
+                });
+            } catch (err) {
+                container.innerHTML = `<p style="color:var(--muted)">No quotes found in <code>quotes/quotes.md</code>.</p>`;
+            }
+        }
+        loadQuotes();
+    </script>
+</body>
+</html>
