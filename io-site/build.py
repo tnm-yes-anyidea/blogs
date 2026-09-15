@@ -21,6 +21,7 @@ MathJax = {
 <style>
 body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; max-width: 850px; margin: 40px auto; padding: 0 20px; line-height: 1.6; color: #222; }
 div.abstract { background: #f8f9fa; border-left: 4px solid #0066cc; padding: 12px 16px; margin: 20px 0; font-style: italic; }
+blockquote { border-left: 4px solid #ccc; margin: 20px 0; padding: 8px 16px; color: #555; background: #fafafa; font-style: italic; }
 table { border-collapse: collapse; width: 100%; margin: 20px 0; }
 th, td { border: 1px solid #ddd; padding: 10px 14px; text-align: left; }
 th { background-color: #f4f4f4; }
