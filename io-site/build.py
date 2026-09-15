@@ -5,17 +5,30 @@ import subprocess
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 EXCLUDE_DIRS = {".git", ".github", "io-site", "data", "figures", "calculations"}
 
+# Header with MathJax 3 configuration for complete TeX math/macro rendering
 PANDOC_HEADER = """<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+<script>
+MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\\\(', '\\\\)']],
+    displayMath: [['$$', '$$'], ['\\\\[', '\\\\]']],
+    processEscapes: true,
+    packages: {'[+]': ['base', 'ams', 'noerrors', 'noundefined']}
+  }
+};
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 <style>
-body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; max-width: 800px; margin: 40px auto; padding: 0 20px; line-height: 1.6; color: #222; }
-div.abstract { background: #f8f9fa; border-left: 4px solid #0066cc; padding: 12px 16px; margin: 20px 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; max-width: 850px; margin: 40px auto; padding: 0 20px; line-height: 1.6; color: #222; }
+div.abstract { background: #f8f9fa; border-left: 4px solid #0066cc; padding: 12px 16px; margin: 20px 0; font-style: italic; }
 table { border-collapse: collapse; width: 100%; margin: 20px 0; }
-th, td { border: 1px solid #ddd; padding: 8px 12px; text-align: left; }
+th, td { border: 1px solid #ddd; padding: 10px 14px; text-align: left; }
 th { background-color: #f4f4f4; }
 pre, code { background: #f4f4f4; padding: 2px 6px; border-radius: 4px; font-family: monospace; }
 a { color: #0066cc; text-decoration: none; }
 a:hover { text-decoration: underline; }
+.title { font-size: 2em; margin-bottom: 0.2em; }
+.author { font-weight: bold; color: #555; margin-bottom: 2em; }
 </style>
 """
 
@@ -29,7 +42,6 @@ def extract_title(file_path):
             match = re.search(r"^#\s+(.+)$", content, re.MULTILINE)
             return match.group(1).strip() if match else folder_name
         else:
-            # Parse LaTeX title tags, stripping formatting like \textbf{}
             match = re.search(r"\\title\{([\s\S]*?)\}", content)
             if match:
                 raw_title = match.group(1)
@@ -44,12 +56,16 @@ def compile_file(input_file, output_html, title):
     with open(header_file, "w", encoding="utf-8") as f:
         f.write(PANDOC_HEADER)
 
+    # Determine explicit reader format for Pandoc
+    input_format = "latex" if input_file.endswith(".tex") else "markdown"
+
     cmd = [
         "pandoc",
+        f"--from={input_format}",
         input_file,
         "-o", output_html,
         "--standalone",
-        "--katex",
+        "--mathjax",
         f"--metadata=title:{title}",
         "-H", header_file
     ]
@@ -59,7 +75,7 @@ def compile_file(input_file, output_html, title):
         os.remove(header_file)
         
     if res.returncode != 0:
-        print(f"Pandoc error on {input_file}:\n{res.stderr}")
+        print(f"Error compiling {input_file}:\n{res.stderr}")
         return False
     return True
 
@@ -85,7 +101,6 @@ def main():
                 if compile_file(target_file, out_html, title):
                     blogs.append({"title": title, "path": f"{entry}/index.html"})
 
-    # Create root index.html
     list_items = "".join([f'<li><a href="{b["path"]}">{b["title"]}</a></li>' for b in blogs])
     main_index = f"""<!DOCTYPE html>
 <html lang="en">
