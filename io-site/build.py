@@ -1,6 +1,7 @@
 import os
 import re
 import subprocess
+import json
 
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 EXCLUDE_DIRS = {".git", ".github", "io-site", "data", "figures", "calculations"}
@@ -122,6 +123,9 @@ def main():
     with open(os.path.join(ROOT_DIR, "index.html"), "w", encoding="utf-8") as f:
         f.write(main_index)
     print("Build finished successfully.")
+    with open(os.path.join(ROOT_DIR, "blogs.json"), "w", encoding="utf-8") as f:
+        json.dump(blogs, f, indent=2)
+
 
 if __name__ == "__main__":
     main()
