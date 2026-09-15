@@ -5,7 +5,6 @@ import subprocess
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 EXCLUDE_DIRS = {".git", ".github", "io-site", "data", "figures", "calculations"}
 
-# Inline HTML Header with CDN KaTeX and clean CSS
 PANDOC_HEADER = """<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
 <style>
@@ -15,21 +14,30 @@ table { border-collapse: collapse; width: 100%; margin: 20px 0; }
 th, td { border: 1px solid #ddd; padding: 8px 12px; text-align: left; }
 th { background-color: #f4f4f4; }
 pre, code { background: #f4f4f4; padding: 2px 6px; border-radius: 4px; font-family: monospace; }
-.back-btn { display: inline-block; margin-bottom: 20px; text-decoration: none; color: #0066cc; }
+a { color: #0066cc; text-decoration: none; }
+a:hover { text-decoration: underline; }
 </style>
 """
 
 def extract_title(file_path):
-    with open(file_path, "r", encoding="utf-8") as f:
-        content = f.read()
-    if file_path.endswith(".md"):
-        match = re.search(r"^#\s+(.+)$", content, re.MULTILINE)
-        return match.group(1).strip() if match else "Untitled Post"
-    else:
-        match = re.search(r"\\title\{([^}]+)\}", content)
-        if match:
-            return match.group(1).replace("\\textbf{", "").replace("}", "").strip()
-        return "Untitled Paper"
+    folder_name = os.path.basename(os.path.dirname(file_path)).replace("-", " ").title()
+    try:
+        with open(file_path, "r", encoding="utf-8") as f:
+            content = f.read()
+            
+        if file_path.endswith(".md"):
+            match = re.search(r"^#\s+(.+)$", content, re.MULTILINE)
+            return match.group(1).strip() if match else folder_name
+        else:
+            # Parse LaTeX title tags, stripping formatting like \textbf{}
+            match = re.search(r"\\title\{([\s\S]*?)\}", content)
+            if match:
+                raw_title = match.group(1)
+                clean_title = re.sub(r"\\[a-zA-Z]+\{?", "", raw_title).replace("}", "").strip()
+                return clean_title if clean_title else folder_name
+            return folder_name
+    except Exception:
+        return folder_name
 
 def compile_file(input_file, output_html, title):
     header_file = os.path.join(ROOT_DIR, "io-site", "_header.html")
@@ -43,15 +51,23 @@ def compile_file(input_file, output_html, title):
         "--standalone",
         "--katex",
         f"--metadata=title:{title}",
-        f"-H", header_file
+        "-H", header_file
     ]
-    subprocess.run(cmd, check=True)
+    
+    res = subprocess.run(cmd, capture_output=True, text=True)
     if os.path.exists(header_file):
         os.remove(header_file)
+        
+    if res.returncode != 0:
+        print(f"Pandoc error on {input_file}:\n{res.stderr}")
+        return False
+    return True
 
 def main():
     blogs = []
-    for entry in os.listdir(ROOT_DIR):
+    print(f"Scanning directory: {ROOT_DIR}")
+    
+    for entry in sorted(os.listdir(ROOT_DIR)):
         full_path = os.path.join(ROOT_DIR, entry)
         if os.path.isdir(full_path) and entry not in EXCLUDE_DIRS:
             target_file = None
@@ -64,11 +80,12 @@ def main():
             if target_file:
                 title = extract_title(target_file)
                 out_html = os.path.join(full_path, "index.html")
-                print(f"Compiling: {target_file} -> {out_html}")
-                compile_file(target_file, out_html, title)
-                blogs.append({"title": title, "path": f"{entry}/index.html"})
+                print(f"Building: {target_file} -> {out_html}")
+                
+                if compile_file(target_file, out_html, title):
+                    blogs.append({"title": title, "path": f"{entry}/index.html"})
 
-    # Build main index.html
+    # Create root index.html
     list_items = "".join([f'<li><a href="{b["path"]}">{b["title"]}</a></li>' for b in blogs])
     main_index = f"""<!DOCTYPE html>
 <html lang="en">
@@ -81,13 +98,14 @@ def main():
 <body>
     <main>
         <h1>Articles & Research Papers</h1>
-        <ul>{list_items}</ul>
+        <ul>{list_items if list_items else '<li>No blog posts found.</li>'}</ul>
     </main>
 </body>
 </html>"""
     
     with open(os.path.join(ROOT_DIR, "index.html"), "w", encoding="utf-8") as f:
         f.write(main_index)
+    print("Build finished successfully.")
 
 if __name__ == "__main__":
     main()
