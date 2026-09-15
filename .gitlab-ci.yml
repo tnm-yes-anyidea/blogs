@@ -1,0 +1,24 @@
+image: python:3.11-slim
+
+pages:
+  stage: deploy
+  before_script:
+    - apt-get update && apt-get install -y pandoc git
+  script:
+    # Run the builder script
+    - python io-site/build.py
+    
+    # Assembly phase: move output into public/
+    - mkdir -p public
+    - cp index.html public/
+    - cp -r io-site public/
+    - for dir in */; do
+        if [ "$dir" != "public/" ] && [ "$dir" != "io-site/" ] && [ "$dir" != ".github/" ]; then
+          cp -r "$dir" public/;
+        fi;
+      done
+  artifacts:
+    paths:
+      - public
+  only:
+    - main
