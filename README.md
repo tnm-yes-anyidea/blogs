@@ -5,6 +5,8 @@ Welcome to my personal site and repository index.
 
 ### Every blog of mine is inside it's own folder
 
+### FOR blogs: put them into a folder and main .md or .tex to be named "paper" or README
+
 <!-- BLOG-LIST-START -->
 
 ## Index of Blogs & Research
