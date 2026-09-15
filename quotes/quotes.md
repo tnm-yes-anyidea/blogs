@@ -14,9 +14,7 @@
 
 # 5 September 2026
 ## on Pen and Sword
-> "The quill is mightier than a blade,
-> But not quill writes without being sharpened by a blade,and no blacksmith may learn craft,
-> If it wasn't penned down. "
+> "The quill is mightier than a blade,But not quill writes without being sharpened by a blade,and no blacksmith may learn craft, If it wasn't penned down. "
 — **Tanmoy**
 
 ---

@@ -128,7 +128,7 @@ Malta,18000,250,18250,540000,3.38
 Iraq,17100,4,17104,47699460,0.04
 Jordan,16897,153,17050,12035110,0.14
 ```
-
+![Indian Origin people and their host-nations](diaspora_analysis.png)
 ---
 
 ## 4. Key Findings & Analysis
