@@ -1,0 +1,273 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{geometry}
+\geometry{margin=1in}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{graphicx}
+
+\title{\textbf{Solarising India: A Quantitative Assessment of Solar Energy from Roads, Buildings and Urban Surfaces}}
+\author{\textbf{Base year:} 2026 \quad | \quad \textbf{Country:} India}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+India receives a very large amount of solar radiation because of its geographical position and the availability of many sunny days each year. This paper examines whether existing artificial surfaces---especially building rooftops, building façades and road infrastructure---could provide a substantial fraction of India's growing electricity requirement.
+
+The analysis considers solar resource, photovoltaic efficiency, usable surface area, electricity demand growth, installation cost, value for money, battery storage and material requirements. It distinguishes between technical potential and practical/economic potential. In particular, covering every road or building surface is not assumed to be sensible.
+
+The central conclusion is that rooftops and other already-developed surfaces can provide valuable distributed generation, while utility-scale solar is generally cheaper per unit of capacity. Road solar is most attractive when implemented as canopies over parking, toll areas, depots and selected transport infrastructure rather than photovoltaic pavement. A high-solar electricity system also requires batteries, pumped hydro, transmission, flexible generation and recycling.
+\end{abstract}
+
+\hr
+
+\section{Solar Resource in India}
+
+MNRE describes annual solar radiation across India in the approximate range:
+\[
+1600-2200\ \text{kWh/m}^2/\text{year}
+\]
+
+For a national engineering scenario this paper uses:
+\[
+G = 1900\ \text{kWh/m}^2/\text{year}
+\]
+
+This is an average assumption, not a uniform value. Actual irradiation varies by location, season, weather, tilt and orientation.
+
+India's land area is approximately:
+\[
+3.287 \times 10^{12}\ \text{m}^2
+\]
+
+Using the simplified average:
+\[
+E_{\text{solar}} = 3.287 \times 10^{12} \times 1900
+\]
+\[
+\boxed{E_{\text{solar}} \approx 6.25 \times 10^{15}\ \text{kWh/year}}
+\]
+or approximately:
+\[
+\boxed{6.25 \times 10^6\ \text{TWh/year}}
+\]
+
+This enormous number is the incident solar energy, not electricity that can actually be harvested.
+
+\section{Solar Panel Efficiency}
+
+Modern crystalline-silicon modules can have efficiencies around 20--24\%. This paper uses:
+\[
+\eta = 22\%
+\]
+
+The module-level output from one square metre is:
+\[
+E = 1 \times 1900 \times 0.22 = 418\ \text{kWh/year}
+\]
+
+After allowing for temperature, inverter, wiring, dust, mismatch and other system losses, use a performance ratio:
+\[
+PR = 0.80
+\]
+
+Therefore:
+\[
+E_{\text{useful}} = 418(0.80)
+\]
+\[
+\boxed{E_{\text{useful}} \approx 334\ \text{kWh/m}^2/\text{year}}
+\]
+
+A useful broad rule is therefore:
+\[
+\boxed{1\ \text{m}^2\ \text{of PV} \approx 300\text{--}350\ \text{kWh/year}}
+\]
+depending on location and design.
+
+\section{India's Electricity Requirement}
+
+Electricity demand must be modelled as a growing quantity rather than a constant:
+\[
+D_t = D_0(1+g)^t
+\]
+where $g$ is the annual growth rate.
+
+For an illustrative scenario:
+\[
+g = 4.5\%
+\]
+
+If a round-number middle-2020s baseline is:
+\[
+D_0 = 2000\ \text{TWh/year}
+\]
+then after four years:
+\[
+D_{2030} = 2000(1.045)^4 \approx 2386\ \text{TWh}
+\]
+and after nine years:
+\[
+D_{2035} = 2000(1.045)^9 \approx 2975\ \text{TWh}
+\]
+
+This is a scenario, not an official forecast. Official CEA projections should be used when the model is used for policy work.
+
+\section{Rooftop Solar}
+
+Rooftops are attractive because they use existing infrastructure and generate electricity near consumers. CEEW estimated approximately $637\ \text{GW}$ of technical residential rooftop potential. However, technical potential is not the same as economically deployable capacity.
+
+The practical hierarchy is:
+\[
+\text{technical potential} > \text{economic potential} > \text{actual deployment}
+\]
+because of shading, structural limits, roof ownership, financing, consumer decisions, electricity tariffs and grid constraints.
+
+If $A = 10^9\ \text{m}^2$ of effective PV area were installed, the illustrative output would be:
+\[
+E = 10^9 \times 334 \implies \boxed{E \approx 334\ \text{TWh/year}}
+\]
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{rr}
+\toprule
+\textbf{Effective PV area} & \textbf{Approx. annual generation} \\
+\midrule
+100 million $\text{m}^2$ & 33.4 TWh \\
+500 million $\text{m}^2$ & 167 TWh \\
+1 billion $\text{m}^2$   & 334 TWh \\
+2 billion $\text{m}^2$   & 668 TWh \\
+3 billion $\text{m}^2$   & 1,002 TWh \\
+\bottomrule
+\end{tabular}
+\caption{Scaling of effective PV area to estimated annual generation.}
+\end{table}
+
+\section{Building Façades}
+
+Vertical building surfaces can provide additional PV capacity when roofs are insufficient. However:
+\[
+E_{\text{facade}} < E_{\text{roof}}
+\]
+for many locations because façades often have less favourable orientation and greater shading. Good applications include south/east/west-oriented façades, curtain-wall PV, solar shading, and semi-transparent PV.
+
+\section{Roads and Solar Infrastructure}
+
+For a road, physical surface area is:
+\[
+A = L \times W
+\]
+where $L$ is road length and $W$ is average width. A hypothetical $1,000,000\ \text{km}$ road network with average width of $7\ \text{m}$ has:
+\[
+A = 1,000,000 \times 1000 \times 7 \implies \boxed{A = 7,000\ \text{km}^2}
+\]
+Roads require structural strength, skid resistance, drainage, lane markings, maintenance and traffic safety.
+
+\section{Solar Canopies vs Solar Pavement}
+
+A better transport-solar strategy is to put PV \textbf{above} infrastructure rather than \textbf{inside} pavement:
+\[
+\boxed{\text{PV canopy is generally more practical than PV pavement}}
+\]
+
+\section{Solar Installation Cost}
+
+For an illustrative C\&I rooftop scenario ($C_{\text{PV}} = \text{₹}40/\text{W}$):
+\[
+1\ \text{GW} \times \text{₹}40/\text{W} = \boxed{\text{₹}4,000\ \text{crore}}
+\]
+For a 1 GW plant with $CF = 20\%$:
+\[
+E = 1 \times 8760 \times 0.20 = \boxed{1.752\ \text{TWh/year}}
+\]
+
+\section{Value for Money}
+
+\[
+LCOE = \frac{\text{lifetime discounted cost}}{\text{lifetime discounted electricity}}
+\]
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{ll}
+\toprule
+\textbf{Option} & \textbf{Relative value} \\
+\midrule
+Utility-scale solar & Excellent \\
+Industrial rooftop  & Excellent \\
+Commercial rooftop  & Very good \\
+Residential rooftop & Good \\
+Parking canopy      & Good–moderate \\
+Building façade     & Moderate \\
+Road canopy         & Moderate \\
+Solar pavement      & Low \\
+\bottomrule
+\end{tabular}
+\caption{Practical value comparison across solar integration options.}
+\end{table}
+
+\section{Battery Storage}
+
+Solar output is zero at night, requiring storage or flexible resources:
+\[
+E_{\text{battery}} = P_{\text{battery}} \times t \implies 100\ \text{GW} \times 4\ \text{h} = \boxed{400\ \text{GWh}}
+\]
+\[
+\boxed{\text{Batteries + pumped hydro + hydro + wind + flexible generation}}
+\]
+
+\section{Battery Materials}
+
+Using an LFP planning estimate of $0.10\ \text{kg/kWh}$, $1\ \text{TWh}$ requires:
+\[
+10^9 \times 0.10 = \boxed{100,000\ \text{tonnes of Lithium-equivalent}}
+\]
+
+\section{Solar Module Materials}
+
+Assuming 1 GW of PV uses $5.5 \times 10^6\ \text{m}^2$ of module area at $20\ \text{kg/m}^2$ glass mass:
+\[
+5.5 \times 10^6 \times 20 = \boxed{110,000\ \text{tonnes/GW of glass}}
+\]
+
+\section{A 1 TW Solar Scenario}
+
+A $1000\ \text{GW}$ solar fleet at $CF=20\%$ generates:
+\[
+1000 \times 8760 \times 0.20 = \boxed{1752\ \text{TWh/year}}
+\]
+
+\section{Reaching 1 TW}
+
+Reaching 1000 GW by 2040 from 168.04 GW (Aug 2026 baseline):
+\[
+\frac{1000 - 168.04}{14} \approx \boxed{60\ \text{GW/year required expansion}}
+\]
+
+\section{A Better Deployment Hierarchy}
+
+\[
+\boxed{\text{Industrial roofs} > \text{Commercial roofs} > \text{Residential roofs} > \text{Parking canopies} > \text{Transport} > \text{Façades} > \text{Pavement}}
+\]
+
+\section{Economics of Rooftop Solar}
+
+A 1 MW system costing ₹3.5 crore producing $1.6\ \text{GWh/year}$ at ₹7/kWh saves ₹1.12 crore/year:
+\[
+\text{Simple Payback} = \frac{3.5}{1.12} \approx \boxed{3.1\ \text{years}}
+\]
+
+\section{Main Findings \& Conclusion}
+
+The optimum national strategy requires a balanced ecosystem:
+\[
+\boxed{\text{Solar} + \text{Wind} + \text{Hydro} + \text{Batteries} + \text{Pumped Hydro} + \text{Transmission} + \text{Recycling}}
+\]
+The goal is to generate reliable electricity per rupee, per square metre, and per tonne of material.
+
+\end{document}

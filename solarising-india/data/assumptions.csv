@@ -1,0 +1,12 @@
+parameter,value,unit,type
+solar_irradiation,1900,kWh/m2/year,scenario
+module_efficiency,0.22,fraction,scenario
+performance_ratio,0.8,fraction,scenario
+demand_baseline,2000,TWh/year,scenario
+demand_growth,0.045,fraction/year,scenario
+solar_capacity_factor,0.2,fraction,scenario
+current_solar_capacity,168.04,GW,official MNRE Aug 2026
+target_solar_capacity,1000,GW,illustrative
+rooftop_technical_potential,637,GW,CEEW published estimate
+rooftop_cost,40,INR/W,illustrative
+LFP_lithium_intensity,0.1,kg/kWh,illustrative
