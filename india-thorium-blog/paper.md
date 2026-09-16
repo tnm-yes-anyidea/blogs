@@ -1,7 +1,7 @@
 # India's Thorium Opportunity
 ## From monazite sands to a long-term nuclear fuel cycle
 
-**By constant phy**
+**By Tanmoy**
 
 > **Research blog — September 2026**  
 > This article separates documented facts from illustrative future scenarios.
