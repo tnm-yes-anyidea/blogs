@@ -6,8 +6,10 @@ import json
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 EXCLUDE_DIRS = {".git", ".github", "io-site", "data", "figures", "calculations", "quotes"}
 
-# Header with MathJax 3 configuration for complete TeX math/macro rendering
+# Sashimi UI handles native light/dark theming via the browser's prefers-color-scheme.
 PANDOC_HEADER = """<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sashimi-ui/default.theme.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sashimi-ui/bundle.css">
 <script>
 MathJax = {
   tex: {
@@ -20,21 +22,37 @@ MathJax = {
 </script>
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 <style>
-body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; max-width: 850px; margin: 40px auto; padding: 0 20px; line-height: 1.6; color: #222; }
-div.abstract { background: #f8f9fa; border-left: 4px solid #0066cc; padding: 12px 16px; margin: 20px 0; font-style: italic; }
-blockquote { border-left: 4px solid #ccc; margin: 20px 0; padding: 8px 16px; color: #555; background: #fafafa; font-style: italic; }
-table { border-collapse: collapse; width: 100%; margin: 20px 0; }
-th, td { border: 1px solid #ddd; padding: 10px 14px; text-align: left; }
-th { background-color: #f4f4f4; }
-pre, code { background: #f4f4f4; padding: 2px 6px; border-radius: 4px; font-family: monospace; }
-a { color: #0066cc; text-decoration: none; }
-a:hover { text-decoration: underline; }
-.title { font-size: 2em; margin-bottom: 0.2em; }
-.author { font-weight: bold; color: #555; margin-bottom: 2em; }
-.quote-card { background: #f8f9fa; border: 1px solid #ddd; border-radius: 6px; padding: 1.2rem; margin-bottom: 1.5rem; }
-.quote-meta { display: flex; justify-content: space-between; font-size: 0.8rem; color: #666; margin-bottom: 0.8rem; }
-.quote-body { margin: 0 0 0.8rem 0; font-size: 1.1rem; color: #222; font-style: italic; }
-.quote-author { font-size: 0.85rem; color: #555; text-align: right; font-style: italic; }
+/* 
+  Layout styling to center content and create the minimalist boxes 
+  while letting Sashimi UI handle all typography and coloring.
+*/
+body { max-width: 800px; margin: 40px auto; padding: 0 20px; }
+.blog-grid { display: flex; flex-direction: column; gap: 1rem; margin-top: 1.5rem; }
+.blog-card {
+    display: block;
+    padding: 1.25rem 1.5rem;
+    border: 1px solid var(--sm-color-border, #555);
+    border-radius: 8px;
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.15s ease, border-color 0.15s ease;
+}
+.blog-card h3 { margin: 0; font-size: 1.2rem; }
+.blog-card:hover {
+    border-color: var(--sm-color-primary, #d97706);
+    transform: translateY(-2px);
+}
+.nav-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--sm-color-border, #555);
+    padding-bottom: 1rem;
+    margin-bottom: 2rem;
+}
+.nav-header h1 { margin: 0; font-size: 1.5rem; }
+.github-icon { width: 24px; height: 24px; fill: currentColor; transition: opacity 0.2s; }
+.github-icon:hover { opacity: 0.7; }
 </style>
 """
 
@@ -62,7 +80,6 @@ def compile_file(input_file, output_html, title):
     with open(header_file, "w", encoding="utf-8") as f:
         f.write(PANDOC_HEADER)
 
-    # Determine explicit reader format for Pandoc
     input_format = "latex" if input_file.endswith(".tex") else "markdown"
 
     cmd = [
@@ -107,14 +124,17 @@ def load_quotes():
         quote = quote_m.group(1) if quote_m else entry
         author = author_m.group(1) if author_m else "anonymous"
 
+        # Leveraging native HTML tags so Sashimi UI can style them automatically
         cards.append(f"""
-        <article class="quote-card">
-            <div class="quote-meta">
+        <article style="margin-bottom: 2rem;">
+            <div style="display: flex; justify-content: space-between; font-size: 0.9em; opacity: 0.7;">
                 <span>{date}</span>
                 <span>{topic}</span>
             </div>
-            <blockquote class="quote-body">“{quote}”</blockquote>
-            <div class="quote-author">— {author}</div>
+            <blockquote>
+                <p>“{quote}”</p>
+                <footer>— <cite>{author}</cite></footer>
+            </blockquote>
         </article>
         """)
 
@@ -142,7 +162,8 @@ def main():
                 if compile_file(target_file, out_html, title):
                     blogs.append({"title": title, "path": f"{entry}/index.html"})
 
-    list_items = "".join([f'<li><a href="{b["path"]}">{b["title"]}</a></li>' for b in blogs])
+    # Wrapping the links into the blog-card class for the minimalist box look
+    list_items = "".join([f'<a href="{b["path"]}" class="blog-card"><h3>{b["title"]}</h3></a>' for b in blogs])
     quotes_html = load_quotes()
 
     main_index = f"""<!DOCTYPE html>
@@ -154,15 +175,26 @@ def main():
     {PANDOC_HEADER}
 </head>
 <body>
-    <main>
-        <h1>Articles & Research Papers</h1>
-        <ul>{list_items if list_items else '<li>No blog posts found.</li>'}</ul>
+    <header class="nav-header">
+        <h1>blogs</h1>
+        <a href="https://github.com/tnm-yes-anyidea/blogs" target="_blank" rel="noopener noreferrer" aria-label="GitHub Repository">
+            <svg class="github-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+            </svg>
+        </a>
+    </header>
 
-        <hr style="margin: 2.5rem 0; border: 0; border-top: 1px solid #ddd;">
+    <main>
+        <h2>Articles & Research Papers</h2>
+        <div class="blog-grid">
+            {list_items if list_items else '<p>No blog posts found.</p>'}
+        </div>
+
+        <hr style="margin: 2.5rem 0;">
 
         <h2>Reflections & Quotes</h2>
         <div id="quotes-section">
-            {quotes_html if quotes_html else '<p style="color: #666;">No quotes found in quotes/quotes.md.</p>'}
+            {quotes_html if quotes_html else '<p>No quotes found in quotes/quotes.md.</p>'}
         </div>
         <a href="quotes/quotes.html" class="quotes-link">View full quotes page →</a>
     </main>
