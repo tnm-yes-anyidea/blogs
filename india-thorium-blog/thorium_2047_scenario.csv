@@ -1,0 +1,7 @@
+metric,value,unit,basis
+Illustrative 2047 electricity demand,2500.0,TWh/year,Scenario assumption
+Illustrative thorium share,30.0,%,Scenario assumption
+Illustrative thorium generation,750.0,TWh/year,Calculated
+Equivalent average capacity,95.1,GW,Calculated
+300-MWe-equivalent units,317.0,units,Rounded up
+Benchmark capital scale,1430000.0,₹ crore,PHWR benchmark only
