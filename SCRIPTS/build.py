@@ -20,14 +20,15 @@ MathJax = {
 </script>
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 <style>
-  :root {
-    --bg: #fbf0d9;
-    --card-bg: #f4e6ca;
-    --text: #2c251e;
-    --muted: #736553;
-    --border: #e0d0b1;
-    --accent: #b45309;
-    --code-bg: #efe0c1;
+
+:root, [data-theme="warm"] {
+    --bg: #f4ebd0;          /* Warm parchment paper background */
+    --card-bg: #e8dcbe;     /* Slightly deeper cream for blog cards & boxes */
+    --text: #2b251f;        /* Soft espresso text (prevents stark contrast glare) */
+    --muted: #736454;       /* Warm taupe for dates, quotes, and meta text */
+    --border: #d8c7a5;      /* Gentle paper border tone */
+    --accent: #b45309;      /* Warm amber/terracotta for links and highlights */
+    --code-bg: #e2d3b2;     /* Soft warm tint for code blocks */
   }
 
   [data-theme="light"] {
