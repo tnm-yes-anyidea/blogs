@@ -4,12 +4,10 @@ import subprocess
 import json
 
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-EXCLUDE_DIRS = {".git", ".github", "io-site", "data", "figures", "calculations", "quotes"}
+EXCLUDE_DIRS = {".git", ".github", "SCRIPTS", "data", "figures", "calculations", "quotes"}
 
-# Sashimi UI handles native light/dark theming via the browser's prefers-color-scheme.
+# Integrated CSS with Warm/Sepia (Yellowish) theme support and Theme Switcher
 PANDOC_HEADER = """<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sashimi-ui/default.theme.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sashimi-ui/bundle.css">
 <script>
 MathJax = {
   tex: {
@@ -22,38 +20,137 @@ MathJax = {
 </script>
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 <style>
-/* 
-  Layout styling to center content and create the minimalist boxes 
-  while letting Sashimi UI handle all typography and coloring.
-*/
-body { max-width: 800px; margin: 40px auto; padding: 0 20px; }
-.blog-grid { display: flex; flex-direction: column; gap: 1rem; margin-top: 1.5rem; }
-.blog-card {
+  :root {
+    --bg: #fbf0d9;
+    --card-bg: #f4e6ca;
+    --text: #2c251e;
+    --muted: #736553;
+    --border: #e0d0b1;
+    --accent: #b45309;
+    --code-bg: #efe0c1;
+  }
+
+  [data-theme="light"] {
+    --bg: #ffffff;
+    --card-bg: #f9fafb;
+    --text: #111827;
+    --muted: #4b5563;
+    --border: #e5e7eb;
+    --accent: #2563eb;
+    --code-bg: #f3f4f6;
+  }
+
+  [data-theme="dark"] {
+    --bg: #0d1117;
+    --card-bg: #161b22;
+    --text: #c9d1d9;
+    --muted: #8b949e;
+    --border: #30363d;
+    --accent: #58a6ff;
+    --code-bg: #1f242c;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Georgia, monospace;
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 0 20px;
+    line-height: 1.6;
+    transition: background 0.2s ease, color 0.2s ease;
+  }
+
+  .nav-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .nav-controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .theme-select {
+    background: var(--card-bg);
+    color: var(--text);
+    border: 1px solid var(--border);
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+  }
+
+  .github-icon {
+    width: 22px;
+    height: 22px;
+    fill: var(--text);
+    transition: opacity 0.2s;
+  }
+
+  .github-icon:hover { opacity: 0.75; }
+
+  .search-box {
+    width: 100%;
+    padding: 0.65rem 1rem;
+    border: 1px solid var(--border);
+    background: var(--card-bg);
+    color: var(--text);
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    font-size: 0.95rem;
+    box-sizing: border-box;
+  }
+
+  .blog-grid { display: flex; flex-direction: column; gap: 1rem; }
+  .blog-card {
     display: block;
     padding: 1.25rem 1.5rem;
-    border: 1px solid var(--sm-color-border, #555);
+    background: var(--card-bg);
+    border: 1px solid var(--border);
     border-radius: 8px;
     text-decoration: none;
     color: inherit;
     transition: transform 0.15s ease, border-color 0.15s ease;
-}
-.blog-card h3 { margin: 0; font-size: 1.2rem; }
-.blog-card:hover {
-    border-color: var(--sm-color-primary, #d97706);
+  }
+
+  .blog-card h3 { margin: 0; font-size: 1.2rem; color: var(--text); }
+  .blog-card:hover {
+    border-color: var(--accent);
     transform: translateY(-2px);
-}
-.nav-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid var(--sm-color-border, #555);
-    padding-bottom: 1rem;
-    margin-bottom: 2rem;
-}
-.nav-header h1 { margin: 0; font-size: 1.5rem; }
-.github-icon { width: 24px; height: 24px; fill: currentColor; transition: opacity 0.2s; }
-.github-icon:hover { opacity: 0.7; }
+  }
+
+  blockquote {
+    border-left: 4px solid var(--accent);
+    margin: 1rem 0;
+    padding: 0.5rem 1rem;
+    background: var(--card-bg);
+    color: var(--muted);
+  }
+
+  code, pre { background: var(--code-bg); padding: 2px 6px; border-radius: 4px; }
+  a { color: var(--accent); }
 </style>
+
+<script>
+  // Dynamic theme switching script
+  function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('blog-theme', theme);
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const savedTheme = localStorage.getItem('blog-theme') || 'warm';
+    applyTheme(savedTheme);
+    const select = document.getElementById('theme-select');
+    if (select) select.value = savedTheme;
+  });
+</script>
 """
 
 def extract_title(file_path):
@@ -76,7 +173,7 @@ def extract_title(file_path):
         return folder_name
 
 def compile_file(input_file, output_html, title):
-    header_file = os.path.join(ROOT_DIR, "io-site", "_header.html")
+    header_file = os.path.join(ROOT_DIR, "SCRIPTS", "_header.html")
     with open(header_file, "w", encoding="utf-8") as f:
         f.write(PANDOC_HEADER)
 
@@ -124,10 +221,9 @@ def load_quotes():
         quote = quote_m.group(1) if quote_m else entry
         author = author_m.group(1) if author_m else "anonymous"
 
-        # Leveraging native HTML tags so Sashimi UI can style them automatically
         cards.append(f"""
-        <article style="margin-bottom: 2rem;">
-            <div style="display: flex; justify-content: space-between; font-size: 0.9em; opacity: 0.7;">
+        <article style="margin-bottom: 1.5rem;">
+            <div style="display: flex; justify-content: space-between; font-size: 0.85em; opacity: 0.7;">
                 <span>{date}</span>
                 <span>{topic}</span>
             </div>
@@ -162,12 +258,11 @@ def main():
                 if compile_file(target_file, out_html, title):
                     blogs.append({"title": title, "path": f"{entry}/index.html"})
 
-    # Wrapping the links into the blog-card class for the minimalist box look
     list_items = "".join([f'<a href="{b["path"]}" class="blog-card"><h3>{b["title"]}</h3></a>' for b in blogs])
     quotes_html = load_quotes()
 
     main_index = f"""<!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="warm">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -176,28 +271,47 @@ def main():
 </head>
 <body>
     <header class="nav-header">
-        <h1>blogs</h1>
-        <a href="https://github.com/tnm-yes-anyidea/blogs" target="_blank" rel="noopener noreferrer" aria-label="GitHub Repository">
-            <svg class="github-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
-            </svg>
-        </a>
+        <h1 style="margin:0; font-size: 1.5rem;">blogs</h1>
+        <div class="nav-controls">
+            <select id="theme-select" class="theme-select" onchange="applyTheme(this.value)">
+                <option value="warm">📜 Warm (Sepia)</option>
+                <option value="dark">🌙 Dark</option>
+                <option value="light">☀️ Light</option>
+            </select>
+            <a href="https://github.com/tnm-yes-anyidea/blogs" target="_blank" rel="noopener noreferrer" aria-label="GitHub Repository">
+                <svg class="github-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+                </svg>
+            </a>
+        </div>
     </header>
 
     <main>
+        <input type="text" id="search-bar" class="search-box" placeholder="Search articles..." onkeyup="filterArticles()">
         <h2>Articles & Research Papers</h2>
-        <div class="blog-grid">
+        <div class="blog-grid" id="article-grid">
             {list_items if list_items else '<p>No blog posts found.</p>'}
         </div>
 
-        <hr style="margin: 2.5rem 0;">
+        <hr style="margin: 2.5rem 0; border-color: var(--border);">
 
         <h2>Reflections & Quotes</h2>
         <div id="quotes-section">
             {quotes_html if quotes_html else '<p>No quotes found in quotes/quotes.md.</p>'}
         </div>
-        <a href="quotes/quotes.html" class="quotes-link">View full quotes page →</a>
+        <a href="quotes/quotes.html">View full quotes page →</a>
     </main>
+
+    <script>
+        function filterArticles() {{
+            const input = document.getElementById('search-bar').value.toLowerCase();
+            const cards = document.querySelectorAll('#article-grid .blog-card');
+            cards.forEach(card => {{
+                const title = card.textContent.toLowerCase();
+                card.style.display = title.includes(input) ? 'block' : 'none';
+            }});
+        }}
+    </script>
 </body>
 </html>"""
     
@@ -206,7 +320,6 @@ def main():
     print("Build finished successfully.")
     with open(os.path.join(ROOT_DIR, "blogs.json"), "w", encoding="utf-8") as f:
         json.dump(blogs, f, indent=2)
-
 
 if __name__ == "__main__":
     main()
