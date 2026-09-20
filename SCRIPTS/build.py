@@ -6,7 +6,7 @@ import json
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 EXCLUDE_DIRS = {".git", ".github", "SCRIPTS", "data", "figures", "calculations", "quotes"}
 
-# Integrated CSS with Warm/Sepia (Yellowish) theme support and Theme Switcher
+# Integrated CSS with multiple themes including Solarized
 PANDOC_HEADER = """<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script>
 MathJax = {
@@ -22,13 +22,13 @@ MathJax = {
 <style>
 
 :root, [data-theme="warm"] {
-    --bg: #f4ebd0;          /* Warm parchment paper background */
-    --card-bg: #e8dcbe;     /* Slightly deeper cream for blog cards & boxes */
-    --text: #2b251f;        /* Soft espresso text (prevents stark contrast glare) */
-    --muted: #736454;       /* Warm taupe for dates, quotes, and meta text */
-    --border: #d8c7a5;      /* Gentle paper border tone */
-    --accent: #b45309;      /* Warm amber/terracotta for links and highlights */
-    --code-bg: #e2d3b2;     /* Soft warm tint for code blocks */
+    --bg: #f4ebd0;
+    --card-bg: #e8dcbe;
+    --text: #2b251f;
+    --muted: #736454;
+    --border: #d8c7a5;
+    --accent: #b45309;
+    --code-bg: #e2d3b2;
   }
 
   [data-theme="light"] {
@@ -51,6 +51,26 @@ MathJax = {
     --code-bg: #1f242c;
   }
 
+  [data-theme="solarized-light"] {
+    --bg: #fdf6e3;
+    --card-bg: #eee8d5;
+    --text: #657b83;
+    --muted: #93a1a1;
+    --border: #d5d1c2;
+    --accent: #268bd2;
+    --code-bg: #e6e0cc;
+  }
+
+  [data-theme="solarized-dark"] {
+    --bg: #002b36;
+    --card-bg: #073642;
+    --text: #839496;
+    --muted: #586e75;
+    --border: #184956;
+    --accent: #2aa198;
+    --code-bg: #001f27;
+  }
+
   body {
     background: var(--bg);
     color: var(--text);
@@ -69,6 +89,18 @@ MathJax = {
     border-bottom: 1px solid var(--border);
     padding-bottom: 1rem;
     margin-bottom: 2rem;
+  }
+
+  .home-link {
+    font-weight: bold;
+    font-size: 1rem;
+    text-decoration: none;
+    color: var(--text);
+  }
+
+  .home-link:hover {
+    text-decoration: underline;
+    color: var(--accent);
   }
 
   .nav-controls {
@@ -96,36 +128,6 @@ MathJax = {
 
   .github-icon:hover { opacity: 0.75; }
 
-  .search-box {
-    width: 100%;
-    padding: 0.65rem 1rem;
-    border: 1px solid var(--border);
-    background: var(--card-bg);
-    color: var(--text);
-    border-radius: 8px;
-    margin-bottom: 1.5rem;
-    font-size: 0.95rem;
-    box-sizing: border-box;
-  }
-
-  .blog-grid { display: flex; flex-direction: column; gap: 1rem; }
-  .blog-card {
-    display: block;
-    padding: 1.25rem 1.5rem;
-    background: var(--card-bg);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    text-decoration: none;
-    color: inherit;
-    transition: transform 0.15s ease, border-color 0.15s ease;
-  }
-
-  .blog-card h3 { margin: 0; font-size: 1.2rem; color: var(--text); }
-  .blog-card:hover {
-    border-color: var(--accent);
-    transform: translateY(-2px);
-  }
-
   blockquote {
     border-left: 4px solid var(--accent);
     margin: 1rem 0;
@@ -137,6 +139,19 @@ MathJax = {
   code, pre { background: var(--code-bg); padding: 2px 6px; border-radius: 4px; }
   a { color: var(--accent); }
 </style>
+
+<header class="nav-header">
+  <a href="../index.html" class="home-link">← Back to Index</a>
+  <div class="nav-controls">
+    <select id="theme-select" class="theme-select" onchange="applyTheme(this.value)">
+      <option value="warm">📜 Warm (Sepia)</option>
+      <option value="light">☀️ Light</option>
+      <option value="dark">🌙 Dark</option>
+      <option value="solarized-light">🌅 Solarized Light</option>
+      <option value="solarized-dark">🌌 Solarized Dark</option>
+    </select>
+  </div>
+</header>
 
 <script>
   // Dynamic theme switching script
@@ -276,8 +291,10 @@ def main():
         <div class="nav-controls">
             <select id="theme-select" class="theme-select" onchange="applyTheme(this.value)">
                 <option value="warm">📜 Warm (Sepia)</option>
-                <option value="dark">🌙 Dark</option>
                 <option value="light">☀️ Light</option>
+                <option value="dark">🌙 Dark</option>
+                <option value="solarized-light">🌅 Solarized Light</option>
+                <option value="solarized-dark">🌌 Solarized Dark</option>
             </select>
             <a href="https://github.com/tnm-yes-anyidea/blogs" target="_blank" rel="noopener noreferrer" aria-label="GitHub Repository">
                 <svg class="github-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
